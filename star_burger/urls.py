@@ -33,3 +33,15 @@ if settings.DEBUG:
     urlpatterns = [
         path(r'__debug__/', include(debug_toolbar.urls)),
     ] + urlpatterns
+
+def get_order(request):
+    try:
+        order = json.loads(request.body.decode())
+    except ValueError:
+        return JsonResponse({
+            'error': 'error occurs',
+        })
+
+    print(order)
+
+
