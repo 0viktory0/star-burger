@@ -1,6 +1,8 @@
 import json
 
+from rest_framework.decorators import api_view
 from django.http import JsonResponse
+from rest_framework.response import Response
 from django.templatetags.static import static
 
 from .models import Product, Order, OrderProduct
@@ -32,7 +34,7 @@ def banners_list_api(request):
         'indent': 4,
     })
 
-
+@api_view(['GET'])
 def product_list_api(request):
     products = Product.objects.select_related('category').available()
 
@@ -55,29 +57,29 @@ def product_list_api(request):
             }
         }
         dumped_products.append(dumped_product)
-    return JsonResponse(dumped_products, safe=False, json_dumps_params={
-        'ensure_ascii': False,
-        'indent': 4,
-    })
+    return Response(dumped_products)
 
-
+@api_view(['POST'])
 def register_order(request):
-    order_structure = json.loads(request.body.decode())
+    order_data = request.data
     order = Order.objects.create(
-        firstname=order_structure["firstname"],
-        lastname=order_structure["lastname"],
-        phonenumber=order_structure['phonenumber'],
-        address=order_structure['address'],
+        firstname=order_data["firstname"],
+        lastname=order_data["lastname"],
+        phonenumber=order_data['phonenumber'],
+        address=order_data['address'],
     )
-    order_products = []
-    for product in order_structure['products']:
+    for product in order_data['products']:
         product_id = product.get('product')
-        quantity = product.get('quantity')
-        product = Product.objects.get(id=product_id)
-        order_products.append(OrderProduct(
+        order_elements = OrderProduct.objects.create(
             order=order,
-            product=product,
-            quantity=quantity,
-        ))
-    OrderProduct.objects.bulk_create(order_products)
-    return JsonResponse({})
+            product=Product.objects.get(id=product_id),
+            quantity=product['quantity']
+        )
+    order_products = {
+        'products': [product for product in order_data['products']],
+        'firstname': order_data['firstname'],
+        'lastname': order_data['lastname'],
+        'phonenumber': order_data['phonenumber'],
+        'address': order_data['address']
+    }
+    return Response(order_products)
