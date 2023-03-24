@@ -143,7 +143,9 @@ class Order(models.Model):
 
     phonenumber = PhoneNumberField(
         verbose_name='номер телефона',
-        db_index=True,
+        region='RU',
+        max_length=20,
+        db_index=True
     )
 
     address = models.CharField(
@@ -183,4 +185,4 @@ class OrderProduct(models.Model):
         verbose_name_plural = 'Товары заказа'
 
     def __str__(self):
-        return f'{self.order} {self.product}'
+        return f'{self.product.name} - {self.order.firstname} {self.order.lastname}'
