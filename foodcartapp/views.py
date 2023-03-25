@@ -3,9 +3,9 @@ from django.http import JsonResponse
 from rest_framework.response import Response
 from django.templatetags.static import static
 from rest_framework.serializers import ModelSerializer
+from django.db import transaction
 
 from .models import Product, Order, OrderProduct
-
 
 
 def banners_list_api(request):
@@ -71,7 +71,7 @@ class OrderSerializer(ModelSerializer):
         model = Order
         fields = ['id', 'firstname', 'lastname', 'address', 'phonenumber', 'products']
 
-
+@transaction.atomic
 @api_view(['POST'])
 def register_order(request):
     serializer = OrderSerializer(data=request.data)
