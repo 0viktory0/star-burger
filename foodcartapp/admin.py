@@ -118,15 +118,12 @@ class OrderProductInline(admin.TabularInline):
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = [
-        'address',
-        'firstname',
-        'lastname',
-        'phonenumber',
-    ]
     readonly_fields = [
         'order_price'
     ]
+
+    inlines = [OrderProductInline,]
+
     def order_price(self, obj):
         price = OrderProduct.objects.filter(order=obj).order_price()
         return float(price)
@@ -141,7 +138,7 @@ class OrderAdmin(admin.ModelAdmin):
         else:
             return res
 
-    inlines = (OrderProductInline,)
+
 
 
 

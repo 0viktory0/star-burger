@@ -202,7 +202,6 @@ class Order(models.Model):
         db_index=True
     )
 
-
     class Meta:
         verbose_name = 'заказ'
         verbose_name_plural = 'заказы'
@@ -214,10 +213,10 @@ class Order(models.Model):
 class OrderProductQuerySet(models.QuerySet):
 
     def order_price(self):
-        order_products = self.annotate(product_price=F('price') * F('quantity'))
+        order_products = self.annotate(product_price=F('product__price') * F('quantity'))
         price = 0
-        for product in order_products:
-            price += product.product_price
+        for item in order_products:
+            price += item.product_price
         return price
 
 

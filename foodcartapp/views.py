@@ -86,6 +86,7 @@ def register_order(request):
 
     for product_param in order_info['products']:
         product_name = product_param.get('product')
+        quantity = product_param.get('quantity')
         product = Product.objects.get(name=product_name)
         order_elements = OrderProduct.objects.create(
             order=order,
