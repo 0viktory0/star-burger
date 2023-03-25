@@ -57,13 +57,13 @@ def product_list_api(request):
     return Response(dumped_products)
 
 
-class OrderProductSerializer(ModelSerializer):
+class OrderElementsSerializer(ModelSerializer):
     class Meta:
         model = OrderProduct
         fields = ['product', 'quantity']
 
 class OrderSerializer(ModelSerializer):
-    products = OrderProductSerializer(many=True,
+    products = OrderElementsSerializer(many=True,
                                        allow_empty=False,
                                        write_only=True)
 
@@ -77,15 +77,6 @@ def register_order(request):
     serializer = OrderSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
     order_info = serializer.validated_data
-    # try:
-    #     client_phone = phonenumbers.parse(order_info['phonenumber'], 'RU')
-    #     if phonenumbers.is_valid_number(client_phone):
-    #         phonenumber = order_info['phonenumber']
-    #     else:
-    #         return Response({'phonenumber': 'Введен некорректный номер телефона'})
-    # except:
-    #     return Response({'phonenumber': 'Введен некорректный номер телефона'})
-
     order = Order.objects.create(
         firstname=order_info['firstname'],
         lastname=order_info['lastname'],
