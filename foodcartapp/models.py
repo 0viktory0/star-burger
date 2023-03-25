@@ -196,7 +196,7 @@ class OrderProduct(models.Model):
         verbose_name='Цена товара',
         max_digits=5,
         decimal_places=2,
-        default=1,
+        default=0,
         validators=[MinValueValidator(0)]
     )
 
