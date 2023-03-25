@@ -122,4 +122,13 @@ class OrderAdmin(admin.ModelAdmin):
         'lastname',
         'phonenumber',
     ]
+    readonly_fields = [
+        'order_price'
+    ]
+    def order_price(self, obj):
+        price = OrderProduct.objects.filter(order=obj).order_price()
+        return float(price)
     inlines = (OrderProductInline,)
+
+
+
