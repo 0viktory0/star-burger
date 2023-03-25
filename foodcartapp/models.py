@@ -2,6 +2,7 @@ from django.db import models
 from django.core.validators import MinValueValidator
 from phonenumber_field.modelfields import PhoneNumberField
 from django.db.models import Count, F
+from django.utils import timezone
 
 
 
@@ -138,29 +139,24 @@ class Order(models.Model):
         through='OrderProduct',
         related_name='orders',
     )
-
     firstname = models.CharField(
         'имя',
         max_length=10
     )
-
     lastname = models.CharField(
         'фамилия',
         max_length=10
     )
-
     phonenumber = PhoneNumberField(
         verbose_name='номер телефона',
         region='RU',
         max_length=20,
         db_index=True
     )
-
     address = models.CharField(
         'адрес',
         max_length=50
     )
-
     status = models.CharField(
         verbose_name='Статус заказа',
         max_length=20,
@@ -173,6 +169,23 @@ class Order(models.Model):
         default='',
         blank=True,
         null=True,
+    )
+    registered_at = models.DateTimeField(
+        verbose_name='Время создания заказа',
+        default=timezone.now
+    )
+
+    called_at = models.DateTimeField(
+        verbose_name='Время звонка',
+        db_index=True,
+        blank=True,
+        null=True
+    )
+    delivered_at = models.DateTimeField(
+        verbose_name='Время доставки',
+        db_index=True,
+        blank=True,
+        null=True
     )
 
     class Meta:
