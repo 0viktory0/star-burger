@@ -134,6 +134,13 @@ class Order(models.Model):
         ('completed', 'Выполнен'),
     )
 
+    PAYMENT = (
+        ('not_set', 'Не выбран'),
+        ('now', 'Сразу'),
+        ('online', 'Электронно'),
+        ('cash', 'Наличностью'),
+    )
+
     products = models.ManyToManyField(
         Product,
         through='OrderProduct',
@@ -187,6 +194,14 @@ class Order(models.Model):
         blank=True,
         null=True
     )
+    pay_form = models.CharField(
+        verbose_name='Способ оплаты',
+        max_length=20,
+        choices=PAYMENT,
+        default='Не выбран',
+        db_index=True
+    )
+
 
     class Meta:
         verbose_name = 'заказ'
