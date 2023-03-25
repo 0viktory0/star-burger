@@ -1,6 +1,7 @@
 from django.db import models
 from django.core.validators import MinValueValidator
 from phonenumber_field.modelfields import PhoneNumberField
+from django.db.models import Count, F
 
 
 
@@ -161,6 +162,16 @@ class Order(models.Model):
         return f'{self.lastname} {self.firstname}'
 
 
+class OrderProductQuerySet(models.QuerySet):
+
+    def order_price(self):
+        order_products = self.annotate(product_price=F('product__price') * F('quantity'))
+        price = 0
+        for product in order_products:
+            price += product.product_price
+        return price
+
+
 class OrderProduct(models.Model):
     order = models.ForeignKey(
         'Order',
@@ -179,6 +190,7 @@ class OrderProduct(models.Model):
         validators=[MinValueValidator(1)],
     )
 
+    objects = OrderProductQuerySet.as_manager()
 
     class Meta:
         verbose_name = 'Товар заказа'
