@@ -168,6 +168,12 @@ class Order(models.Model):
         default='Необработанный',
         db_index=True
     )
+    comment = models.TextField(
+        verbose_name='Комментарий к заказу',
+        default='',
+        blank=True,
+        null=True,
+    )
 
     class Meta:
         verbose_name = 'заказ'
