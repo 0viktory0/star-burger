@@ -201,6 +201,14 @@ class Order(models.Model):
         default='Не выбран',
         db_index=True
     )
+    restaurant = models.ForeignKey(
+        Restaurant,
+        related_name='orders',
+        verbose_name='ресторан',
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True
+    )
 
     class Meta:
         verbose_name = 'заказ'

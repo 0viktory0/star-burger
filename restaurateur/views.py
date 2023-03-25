@@ -7,7 +7,7 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth import views as auth_views
 
 from foodcartapp.models import Product, Restaurant, Order, OrderProduct
-
+from foodcartapp.models import RestaurantMenuItem
 
 class Login(forms.Form):
     username = forms.CharField(
@@ -88,26 +88,62 @@ def view_restaurants(request):
     })
 
 
+def get_restaurants(order, order_products):
+    restaurants_lists = []
+    items = RestaurantMenuItem.objects.prefetch_related('restaurant')
+    for element in order_products:
+        menu_items = items.filter(product__id=element.product.id)
+        restaurateurs_with_product = [item.restaurant.name for item in menu_items]
+        restaurants_lists.append(restaurateurs_with_product)
+
+    restaurants_for_order = restaurants_lists[0]
+    for restaurant in restaurants_lists:
+        restaurants_join = list(set(restaurants_for_order) & set(restaurant))
+        restaurants_for_order = restaurants_join
+
+    order_items = {
+            'id': order.id,
+            'status': order.get_status_display(),
+            'pay_form': order.get_pay_form_display(),
+            'price': order_products.order_price(),
+            'client': order.firstname,
+            'phonenumber': order.phonenumber,
+            'address': order.address,
+            'comment': order.comment,
+            'restaurants': restaurants_for_order
+        }
+
+    return order_items
+
+
 @user_passes_test(is_manager, login_url='restaurateur:login')
 def view_orders(request):
     orders = Order.objects.all()
     order_items = []
     for order in orders:
-        if order.status != 'completed':
-            order_price = OrderProduct.objects.filter(order=order).order_price()
-            order_items.append(
-                {
-                    'id': order.id,
-                    'status': order.get_status_display(),
-                    'pay_form': order.get_pay_form_display(),
-                    'price': order_price,
-                    'client': order.firstname,
-                    'phonenumber': order.phonenumber,
-                    'address': order.address,
-                    'comment': order.comment,
-                }
-            )
+        if order.status != 'Done':
+            order_products = OrderProduct.objects.filter(order=order).prefetch_related('product')
+            if order.restaurant:
+                order.status = 'cooking'
+                order.save()
 
+                order_items.append(
+                    {
+                        'id': order.id,
+                        'status': order.get_status_display(),
+                        'pay_form': order.get_pay_form_display(),
+                        'price': order_products.order_price(),
+                        'client': order.firstname,
+                        'phonenumber': order.phonenumber,
+                        'address': order.address,
+                        'comment': order.comment,
+                        'restaurant': order.restaurant
+                    }
+                )
+            else:
+                order_item = get_restaurants(order, order_products)
+                order_items.append(order_item)
+            print(order_items)
     return render(request, template_name='order_items.html', context={
         'order_items': order_items
     })
