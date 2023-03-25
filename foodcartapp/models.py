@@ -126,6 +126,13 @@ class RestaurantMenuItem(models.Model):
         return f"{self.restaurant.name} - {self.product.name}"
 
 class Order(models.Model):
+    STATUSES = (
+        ('new', 'Необработанный'),
+        ('cooking', 'Готовится'),
+        ('delivering', 'Доставляется'),
+        ('completed', 'Выполнен'),
+    )
+
     products = models.ManyToManyField(
         Product,
         through='OrderProduct',
@@ -152,6 +159,14 @@ class Order(models.Model):
     address = models.CharField(
         'адрес',
         max_length=50
+    )
+
+    status = models.CharField(
+        verbose_name='Статус заказа',
+        max_length=20,
+        choices=STATUSES,
+        default='Необработанный',
+        db_index=True
     )
 
     class Meta:

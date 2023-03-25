@@ -3,10 +3,8 @@ from django.shortcuts import redirect, render
 from django.views import View
 from django.urls import reverse_lazy
 from django.contrib.auth.decorators import user_passes_test
-
 from django.contrib.auth import authenticate, login
 from django.contrib.auth import views as auth_views
-from django.db.models import Count
 
 from foodcartapp.models import Product, Restaurant, Order, OrderProduct
 
@@ -95,16 +93,19 @@ def view_orders(request):
     orders = Order.objects.all()
     order_items = []
     for order in orders:
-        order_price = OrderProduct.objects.filter(order=order).order_price()
-        order_items.append(
-            {
-                'id': order.id,
-                'price': order_price,
-                'client': order.firstname,
-                'phonenumber': order.phonenumber,
-                'address': order.address
-            }
-        )
+        if order.status != 'completed':
+            order_price = OrderProduct.objects.filter(order=order).order_price()
+            order_items.append(
+                {
+                    'id': order.id,
+                    'status': order.get_status_display(),
+                    'price': order_price,
+                    'client': order.firstname,
+                    'phonenumber': order.phonenumber,
+                    'address': order.address
+                }
+            )
+
     return render(request, template_name='order_items.html', context={
         'order_items': order_items
     })
