@@ -165,7 +165,7 @@ class Order(models.Model):
 class OrderProductQuerySet(models.QuerySet):
 
     def order_price(self):
-        order_products = self.annotate(element_price=F('price') * F('quantity'))
+        order_products = self.annotate(product_price=F('price') * F('quantity'))
         price = 0
         for product in order_products:
             price += product.product_price
