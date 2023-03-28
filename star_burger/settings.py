@@ -8,6 +8,8 @@ from environs import Env
 env = Env()
 env.read_env()
 
+YANDEX_API_KEY = env('YANDEX_API_KEY')
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
@@ -20,6 +22,7 @@ ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', ['127.0.0.1', 'localhost'])
 INSTALLED_APPS = [
     'foodcartapp.apps.FoodcartappConfig',
     'restaurateur.apps.RestaurateurConfig',
+    'geoapp',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

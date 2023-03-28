@@ -27,32 +27,29 @@
       <th>Ссылка на админку</th>
     </tr>
 
-    {% for item in order_items %}
+     {% for order, restaurants_summary, available_restaurants in orders_with_restaurants %}
       <tr>
-        <td>{{item.id}}</td>
-        <td>{{item.status}}</td>
-        <td>{{item.pay_form}}</td>
-        <td>{{item.price}}</td>
-        <td>{{item.client}}</td>
-        <td>{{item.phonenumber}}</td>
-        <td>{{item.address}}</td>
-        <td>{{item.comment}}</td>
-        {% if item.restaurants %}
-          <td><details>
-            <summary>Может быть приготовлен ресторанами:</summary>
-            {% for restaurant in item.restaurants %}
-              <h6><span class="badge badge-secondary">{{restaurant}}</span></h6>
-            {% endfor %}
-          </details></td>
-        {% elif item.restaurant %}
-          <td><details>
-            <summary>Заказ готовится рестораном:</summary>
-            <h6><span class="badge badge-primary">{{item.restaurant}}</span></h6>
-          </details></td>
-        {% endif %}
+        <td>{{order.id}}</td>
+        <td>{{order.status}}</td>
+        <td>{{order.pay_form}}</td>
+        <td>{{order.full_price}}</td>
+        <td>{{order.firstname}}</td>
+        <td>{{order.phonenumber}}</td>
+        <td>{{order.address}}</td>
+        <td>{{order.comment}}</td>
         <td>
-          <a href="{% url 'admin:foodcartapp_order_change' object_id=item.id %}?next={{ request.get_full_path|urlencode }}">Редактировать</a>
+          <details>
+            <summary>
+              <p>{{ restaurants_summary }}</p>
+            </summary>
+              {% for restaurant_info in available_restaurants %}
+                {% for restaurant, distance in restaurant_info.items %}
+                  <li>{{ restaurant.name }} - {{ distance }} км</li>
+                {% endfor %}
+              {% endfor %}
+          </details>
         </td>
+        <td><a href="{% url 'admin:foodcartapp_order_change' object_id=order.id %}?next={{ request.get_full_path|urlencode }}">Редактировать</a></td>
       </tr>
     {% endfor %}
    </table>

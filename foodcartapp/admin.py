@@ -118,25 +118,18 @@ class OrderProductInline(admin.TabularInline):
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    readonly_fields = [
-        'order_price'
-    ]
 
     inlines = [OrderProductInline,]
 
-    def order_price(self, obj):
-        price = OrderProduct.objects.filter(order=obj).order_price()
-        return float(price)
-
     def response_post_save_change(self, request, obj):
-        res = super().response_post_save_change(request, obj)
+        response = super().response_post_save_change(request, obj)
         if "next" in request.GET:
             if url_has_allowed_host_and_scheme(request.GET['next'], None):
                 return redirect(request.GET['next'])
             else:
-                return res
+                return response
         else:
-            return res
+            return response
 
 
 

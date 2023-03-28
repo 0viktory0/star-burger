@@ -1,7 +1,7 @@
 from django.db import models
 from django.core.validators import MinValueValidator
 from phonenumber_field.modelfields import PhoneNumberField
-from django.db.models import Count, F
+from django.db.models import F, Sum
 from django.utils import timezone
 
 
@@ -126,6 +126,17 @@ class RestaurantMenuItem(models.Model):
     def __str__(self):
         return f"{self.restaurant.name} - {self.product.name}"
 
+
+class OrderQuerySet(models.QuerySet):
+
+    def order_with_price(self):
+        order_with_full_price = self.annotate(
+            full_price=Sum(F('order_products__price'))
+        )\
+        .order_by('id')
+        return order_with_full_price
+
+
 class Order(models.Model):
     STATUSES = (
         ('new', 'Необработанный'),
@@ -181,7 +192,6 @@ class Order(models.Model):
         verbose_name='Время создания заказа',
         default=timezone.now
     )
-
     called_at = models.DateTimeField(
         verbose_name='Время звонка',
         db_index=True,
@@ -210,22 +220,14 @@ class Order(models.Model):
         null=True
     )
 
+    objects = OrderQuerySet.as_manager()
+
     class Meta:
         verbose_name = 'заказ'
         verbose_name_plural = 'заказы'
 
     def __str__(self):
         return f'{self.lastname} {self.firstname}'
-
-
-class OrderProductQuerySet(models.QuerySet):
-
-    def order_price(self):
-        order_products = self.annotate(product_price=F('product__price') * F('quantity'))
-        price = 0
-        for item in order_products:
-            price += item.product_price
-        return price
 
 
 class OrderProduct(models.Model):
@@ -245,9 +247,6 @@ class OrderProduct(models.Model):
         default=1,
         validators=[MinValueValidator(1)],
     )
-
-    objects = OrderProductQuerySet.as_manager()
-
     price = models.DecimalField(
         verbose_name='Цена товара',
         max_digits=5,
