@@ -35,6 +35,7 @@ if settings.DEBUG:
         path(r'__debug__/', include(debug_toolbar.urls)),
     ] + urlpatterns
 
+
 def get_order(request):
     try:
         order = json.loads(request.body.decode())
@@ -44,5 +45,6 @@ def get_order(request):
         })
 
     print(order)
+
 
 

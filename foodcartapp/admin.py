@@ -1,22 +1,17 @@
 from django.contrib import admin
 from django.shortcuts import reverse, redirect
 from django.templatetags.static import static
-from django.utils.encoding import iri_to_uri
 from django.utils.html import format_html
 from django.utils.http import url_has_allowed_host_and_scheme
 
-from .models import Product
-from .models import ProductCategory
-from .models import Restaurant
-from .models import RestaurantMenuItem
-from .models import Order
-from .models import OrderProduct
+from .models import Product, ProductCategory
+from .models import Restaurant, RestaurantMenuItem
+from .models import Order, OrderProduct
+
 
 class RestaurantMenuItemInline(admin.TabularInline):
     model = RestaurantMenuItem
     extra = 0
-
-
 
 
 @admin.register(Restaurant)
@@ -130,8 +125,3 @@ class OrderAdmin(admin.ModelAdmin):
                 return response
         else:
             return response
-
-
-
-
-

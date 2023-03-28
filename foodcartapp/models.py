@@ -5,7 +5,6 @@ from django.db.models import F, Sum
 from django.utils import timezone
 
 
-
 class Restaurant(models.Model):
     name = models.CharField(
         'название',

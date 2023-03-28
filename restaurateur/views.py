@@ -10,12 +10,12 @@ from django.conf import settings
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth import authenticate, login
 from django.contrib.auth import views as auth_views
-
 from django.db.models import Count
 
-from foodcartapp.models import Product, Restaurant, Order, OrderProduct
+from foodcartapp.models import Product, Restaurant, Order
 from foodcartapp.models import RestaurantMenuItem
 from geoapp.models import Place
+
 
 class Login(forms.Form):
     username = forms.CharField(

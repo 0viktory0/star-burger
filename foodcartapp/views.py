@@ -31,6 +31,7 @@ def banners_list_api(request):
         'indent': 4,
     })
 
+
 @api_view(['GET'])
 def product_list_api(request):
     products = Product.objects.select_related('category').available()
@@ -61,6 +62,7 @@ class OrderElementsSerializer(ModelSerializer):
     class Meta:
         model = OrderProduct
         fields = ['product', 'quantity']
+
 
 class OrderSerializer(ModelSerializer):
     products = OrderElementsSerializer(many=True,
