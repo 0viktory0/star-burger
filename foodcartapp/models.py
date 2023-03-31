@@ -183,9 +183,7 @@ class Order(models.Model):
     )
     comment = models.TextField(
         verbose_name='Комментарий к заказу',
-        default='',
         blank=True,
-        null=True,
     )
     registered_at = models.DateTimeField(
         verbose_name='Время создания заказа',

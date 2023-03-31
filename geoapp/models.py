@@ -12,13 +12,11 @@ class Place(models.Model):
         'Долгота',
         max_length=10,
         blank=True,
-        null=True,
     )
     lat = models.CharField(
         'Широта',
         max_length=10,
         blank=True,
-        null=True,
     )
     request_date = models.DateField(
         'Дата последнего запроса к Геокодеру',
