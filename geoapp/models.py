@@ -8,14 +8,12 @@ class Place(models.Model):
         unique=True,
         db_index=True,
     )
-    lon = models.CharField(
-        'Долгота',
-        max_length=10,
+    lon = models.FloatField(
+        verbose_name='Долгота',
         blank=True,
     )
-    lat = models.CharField(
-        'Широта',
-        max_length=10,
+    lat = models.FloatField(
+        verbose_name='Широта',
         blank=True,
     )
     request_date = models.DateField(
