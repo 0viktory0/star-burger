@@ -5,7 +5,6 @@ from django import forms
 from django.shortcuts import redirect, render
 from django.views import View
 from django.urls import reverse_lazy
-from django.utils import timezone
 from django.conf import settings
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth import authenticate, login
@@ -15,7 +14,7 @@ from django.db.models import Count
 from foodcartapp.models import Product, Restaurant, Order
 from foodcartapp.models import RestaurantMenuItem
 from geoapp.models import Place
-
+from geoapp.geocoding import get_place_coordinates
 
 class Login(forms.Form):
     username = forms.CharField(
@@ -112,24 +111,6 @@ def fetch_coordinates(address):
     most_relevant = found_places[0]
     lon, lat = most_relevant['GeoObject']['Point']['pos'].split(" ")
     return lat, lon
-
-
-def get_place_coordinates(places, address):
-    place = [place for place in places if place.address == address]
-    if not place:
-        coords = fetch_coordinates(address)
-        if not coords:
-            return None
-        lat, lon = coords
-        place = Place.objects.create(
-            address=address,
-            lat=lat,
-            lon=lon,
-            request_date=timezone.now(),
-        )
-    else:
-        place = place[0]
-    return place.lat, place.lon
 
 
 def get_restaurants_details(order, menu_items, restaurants, places):
