@@ -208,10 +208,10 @@ class Order(models.Model):
         default='Не выбран',
         db_index=True
     )
-    restaurant = models.ForeignKey(
+    selected_restaurant = models.ForeignKey(
         Restaurant,
         related_name='orders',
-        verbose_name='ресторан',
+        verbose_name='выбранный ресторан',
         on_delete=models.CASCADE,
         blank=True,
         null=True
