@@ -1,11 +1,9 @@
-import requests
 from geopy import distance
 
 from django import forms
 from django.shortcuts import redirect, render
 from django.views import View
 from django.urls import reverse_lazy
-from django.conf import settings
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth import authenticate, login
 from django.contrib.auth import views as auth_views
@@ -15,6 +13,7 @@ from foodcartapp.models import Product, Restaurant, Order
 from foodcartapp.models import RestaurantMenuItem
 from geoapp.models import Place
 from geoapp.geocoding import get_place_coordinates
+
 
 class Login(forms.Form):
     username = forms.CharField(
@@ -32,13 +31,13 @@ class Login(forms.Form):
         })
     )
 
-
 class LoginView(View):
     def get(self, request, *args, **kwargs):
         form = Login()
         return render(request, "login.html", context={
             'form': form
         })
+
 
     def post(self, request):
         form = Login(request.POST)
@@ -93,24 +92,6 @@ def view_restaurants(request):
     return render(request, template_name="restaurants_list.html", context={
         'restaurants': Restaurant.objects.all(),
     })
-
-
-def fetch_coordinates(address):
-    base_url = "https://geocode-maps.yandex.ru/1.x"
-    response = requests.get(base_url, params={
-        "geocode": address,
-        "apikey": settings.YANDEX_API_KEY,
-        "format": "json",
-    })
-    response.raise_for_status()
-    found_places = response.json()['response']['GeoObjectCollection']['featureMember']
-
-    if not found_places:
-        return None
-
-    most_relevant = found_places[0]
-    lon, lat = most_relevant['GeoObject']['Point']['pos'].split(" ")
-    return lat, lon
 
 
 def get_restaurants_details(order, menu_items, restaurants, places):
