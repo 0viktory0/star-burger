@@ -94,40 +94,6 @@ def view_restaurants(request):
     })
 
 
-def get_restaurants_details(order, menu_items, restaurants, places):
-    if order.restaurant:
-        return (f'Готовит {order.restaurant.name}', None)
-
-    order_products = (order.order_products.all().values_list('product'))
-    order_restaurants = (
-        menu_items
-        .filter(product__in=order_products)
-        .values('restaurant')
-        .annotate(products_count=Count('product'))
-        .filter(products_count=order_products.count())
-        .values('restaurant')
-    )
-
-    if order_restaurants:
-        order_coords = get_place_coordinates(places, order.address)
-        if not order_coords:
-            return ('Ошибка определения координат', None)
-
-        available_restaurants = []
-        for restaurant in restaurants:
-            if {'restaurant': restaurant.pk} in order_restaurants:
-                restaurant_coords = get_place_coordinates(places, restaurant.address)
-                if not restaurant_coords:
-                    return ('Ошибка определения координат', None)
-                order_distance = '{:.2f}'.format(
-                    distance.distance(order_coords, restaurant_coords).km
-                )
-                available_restaurants.append({restaurant: order_distance})
-        return ('Может быть приготовлен ресторанами:', available_restaurants)
-
-    return ('Нет ресторана со всеми позициями', None)
-
-
 @user_passes_test(is_manager, login_url='restaurateur:login')
 def view_orders(request):
     orders = (
