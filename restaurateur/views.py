@@ -1,5 +1,3 @@
-from geopy import distance
-
 from django import forms
 from django.shortcuts import redirect, render
 from django.views import View
@@ -7,12 +5,10 @@ from django.urls import reverse_lazy
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth import authenticate, login
 from django.contrib.auth import views as auth_views
-from django.db.models import Count
 
 from foodcartapp.models import Product, Restaurant, Order
 from foodcartapp.models import RestaurantMenuItem
 from geoapp.models import Place
-from geoapp.geocoding import get_place_coordinates
 
 
 class Login(forms.Form):
@@ -96,14 +92,7 @@ def view_restaurants(request):
 
 @user_passes_test(is_manager, login_url='restaurateur:login')
 def view_orders(request):
-    orders = (
-        Order.objects
-        .select_related('restaurant')
-        .prefetch_related('order_products')
-        .order_with_price()
-        .exclude(status='3')
-        .order_by('restaurant', 'registered_at')
-    )
+    orders = Order.objects.get_orders()
     menu_items = RestaurantMenuItem.objects.select_related('restaurant')\
                                            .select_related('product')
     restaurants = list(Restaurant.objects.all())
@@ -111,7 +100,7 @@ def view_orders(request):
 
     orders_with_restaurants = []
     for order in orders:
-        summary, available_restaurants = get_restaurants_details(
+        summary, available_restaurants = order.get_restaurants_details(
             order,
             menu_items,
             restaurants,

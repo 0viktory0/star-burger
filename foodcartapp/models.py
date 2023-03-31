@@ -1,8 +1,11 @@
+from geopy import distance
+
 from django.db import models
 from django.core.validators import MinValueValidator
 from phonenumber_field.modelfields import PhoneNumberField
-from django.db.models import F, Sum
+from django.db.models import F, Sum, Count
 from django.utils import timezone
+from geoapp.geocoding import get_place_coordinates
 
 
 class Restaurant(models.Model):
@@ -135,7 +138,16 @@ class OrderQuerySet(models.QuerySet):
         .order_by('id')
         return order_with_full_price
 
-
+    def get_orders(self):
+        orders = (
+            Order.objects
+            .select_related('restaurant')
+            .prefetch_related('order_products')
+            .order_with_price()
+            .exclude(status='3')
+            .order_by('restaurant', 'registered_at')
+        )
+        return orders
 class Order(models.Model):
     STATUSES = (
         ('new', 'Необработанный'),
