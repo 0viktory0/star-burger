@@ -141,11 +141,11 @@ class OrderQuerySet(models.QuerySet):
     def get_orders(self):
         orders = (
             Order.objects
-            .select_related('restaurant')
+            .select_related('selected_restaurant')
             .prefetch_related('order_products')
             .order_with_price()
             .exclude(status='3')
-            .order_by('restaurant', 'registered_at')
+            .order_by('selected_restaurant', 'registered_at')
         )
         return orders
 class Order(models.Model):
@@ -239,7 +239,7 @@ class Order(models.Model):
         return f'{self.lastname} {self.firstname}'
 
     def get_restaurants_details(self, order, menu_items, restaurants, places):
-        if order.restaurant:
+        if order.selected_restaurant:
             return (f'Готовит {order.restaurant.name}', None)
 
         order_products = (order.order_products.all().values_list('product'))
@@ -259,7 +259,7 @@ class Order(models.Model):
 
             available_restaurants = []
             for restaurant in restaurants:
-                if {'restaurant': restaurant.pk} in order_restaurants:
+                if {'selected_restaurant': restaurant.pk} in order_restaurants:
                     restaurant_coords = get_place_coordinates(places, restaurant.address)
                     if not restaurant_coords:
                         return ('Ошибка определения координат', None)

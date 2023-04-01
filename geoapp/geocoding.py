@@ -35,11 +35,8 @@ def get_place_coordinates(places, address):
                 lon=lon,
                 request_date=timezone.now(),
             )
-        except requests.exceptions.HTTPError:
-            return None
-
-        except requests.exceptions.ConnectionError:
-            return None
+        except (requests.exceptions.HTTPError, KeyError) as error:
+            pass
     else:
         place = place[0]
     return place.lat, place.lon
