@@ -26,17 +26,20 @@ def fetch_coordinates(address):
 def get_place_coordinates(places, address):
     place = [place for place in places if place.address == address]
     if not place:
+
         try:
             coords = fetch_coordinates(address)
-            lat, lon = coords
-            place = Place.objects.create(
-                address=address,
-                lat=lat,
-                lon=lon,
-                request_date=timezone.now(),
-            )
-        except (requests.exceptions.HTTPError, KeyError) as error:
-            pass
+
+        except requests.exceptions.HTTPError:
+            return None
+
+        lat, lon = coords
+        place = Place.objects.create(
+            address=address,
+            lat=lat,
+            lon=lon,
+            request_date=timezone.now(),
+        )
     else:
         place = place[0]
     return place.lat, place.lon
