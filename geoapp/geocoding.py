@@ -30,7 +30,7 @@ def get_place_coordinates(places, address):
         try:
             coords = fetch_coordinates(address)
 
-        except requests.exceptions.HTTPError:
+        except (requests.exceptions.HTTPError, KeyError) as error:
             return None
 
         lat, lon = coords
