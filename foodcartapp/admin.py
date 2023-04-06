@@ -119,9 +119,7 @@ class OrderAdmin(admin.ModelAdmin):
 
     def response_change(self, request, obj):
         response = super(OrderAdmin, self).response_change(request, obj)
-        if 'next' in request.GET:
-            if url_has_allowed_host_and_scheme(request.GET['next'], None):
-                url = iri_to_uri(request.GET['next'])
-                return redirect(url)
-        else:
-            return response
+        if 'next' in request.GET and url_has_allowed_host_and_scheme(request.GET['next'], None):
+            url = iri_to_uri(request.GET['next'])
+            return redirect(url)
+        return response
