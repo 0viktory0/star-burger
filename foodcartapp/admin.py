@@ -56,6 +56,7 @@ class ProductAdmin(admin.ModelAdmin):
     inlines = [
         RestaurantMenuItemInline
     ]
+
     fieldsets = (
         ('Общее', {
             'fields': [

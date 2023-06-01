@@ -1,23 +1,23 @@
 import os
+import rollbar
 
 import dj_database_url
-
 from environs import Env
 
 
 env = Env()
 env.read_env()
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 YANDEX_API_KEY = env('YANDEX_API_KEY')
+ROLLBAR_TOKEN='5a33bc21da1f452984a936b9d6315aac'
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-
 SECRET_KEY = env('SECRET_KEY')
-DEBUG = env.bool('DEBUG', False)
+DEBUG = env.bool('DEBUG', True)
 
-ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', ['127.0.0.1', 'localhost'])
+ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', ['*'])
 
 INSTALLED_APPS = [
     'foodcartapp.apps.FoodcartappConfig',
@@ -86,8 +86,9 @@ MEDIA_URL = '/media/'
 
 DATABASES = {
     'default': dj_database_url.config(
-        default='sqlite:////{0}'.format(os.path.join(BASE_DIR, 'db.sqlite3'))
-    )
+        conn_max_age=600,
+        conn_health_checks=True,
+    ),
 }
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -120,7 +121,6 @@ STATIC_URL = '/static/'
 INTERNAL_IPS = [
     '127.0.0.1'
 ]
-
 
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "assets"),
