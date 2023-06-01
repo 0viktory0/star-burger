@@ -1,5 +1,6 @@
 import os
 import rollbar
+from git import Repo
 
 import dj_database_url
 from environs import Env
@@ -42,6 +43,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
+    'rollbar.contrib.django.middleware.RollbarNotifierMiddleware',
 ]
 
 ROOT_URLCONF = 'star_burger.urls'
@@ -126,3 +128,14 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "assets"),
     os.path.join(BASE_DIR, "bundles"),
 ]
+
+local_repo = Repo(path=BASE_DIR)
+local_branch = local_repo.active_branch.name
+
+ROLLBAR = {
+    'access_token': env.str('DJANGO_ROLLBAR_TOKEN', None),
+    'environment': env.str(f'ROLLBAR_ENVIRONMENT', 'undefined'),
+    'branch': local_branch,
+    'code_version': '1.0',
+    'root': BASE_DIR,
+}
