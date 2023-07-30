@@ -2,7 +2,6 @@ import os
 import rollbar
 from git import Repo
 
-import dj_database_url
 from environs import Env
 
 
