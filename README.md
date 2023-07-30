@@ -155,6 +155,100 @@ Parcel будет следить за файлами в каталоге `bundle
 - `DATABASE_URL` - однострочный адрес к базе данных, например: `postgres://user:password@localhost:port/database_name`. Больше информации в [документации](https://github.com/jacobian/dj-database-url)
 
 
+
+## Как запустить с помощью Docker
+
+Git должен быть уже установлен.
+
+Также нужна будет поддержка [docker](https://docs.docker.com/get-docker/) и [docker-compose](https://docs.docker.com/compose/install/).
+
+Клонируйте репозиторий:
+```sh
+git clone https://github.com/0viktory0/star-burger
+```
+
+Перейдите в каталог проекта:
+```sh
+cd star-burger
+```
+
+Создайте файл `.env.dev`  (пример можно найти в каталоге `/dockerfiles` - `.env.dev.example`)
+
+Определите следующие переменные окружения:
+
+- `ROLLBAR_ACCESS_TOKEN`- См. выше
+- `YANDEX_API_TOKEN` — См. выше
+
+Соберите необходимые образы и запустите контейнеризированное приложение:
+
+```sh
+docker compose -f docker-compose.dev.yml up -d
+```
+
+Мигрируйте структуру базы данных следующей командой:
+
+```sh
+docker exec -t django python manage.py migrate
+```
+
+Сайт будет доступен в браузере по адресу [http://127.0.0.1:8080/](http://127.0.0.1:8080/)
+
+## Как запустить prod-версию сайта
+
+В production-версии нужна будет поддержка [docker](https://docs.docker.com/get-docker/) и [docker-compose](https://docs.docker.com/compose/install/).
+
+Клонируйте репозиторий:
+```sh
+git clone https://github.com/0viktory0/star-burger
+```
+
+Перейдите в каталог проекта:
+```sh
+cd star-burger
+```
+
+Создайте файл `.env.prod`  (пример можно найти в каталоге `/dockerfiles` - `.env.prod.example`)
+
+Определите в файле `.env.prod` следующие переменные окружения:
+
+- `ALLOWED_HOSTS` — См. выше
+- `POSTGRES_DB` - имя базы данных
+- `POSTGRES_PASSWORD` - пароль к базе данных
+- `POSTGRES_USER` - пользователь базы данных
+- `ROLLBAR_ACCESS_TOKEN`- См. выше
+- `SECRET_KEY` — См. выше
+- `YANDEX_API_TOKEN` — См. выше
+
+Запустите скрипт деплоя:
+
+```bash
+./deploy_script.sh
+```
+
+Вам нужно будет еще настроить сервис `nginx`  для раздачи статики вашего приложения.
+
+Пример такой настройки:
+
+```sh
+server {
+    listen <your_ip_address>:80;
+
+    location / {
+	include '/etc/nginx/proxy_params';
+        proxy_pass http://localhost:8080;
+    }
+
+    location /static/ {
+        alias <path_to_your_django_app>/staticfiles/;
+    }
+
+    location /media/ {
+        alias <path_to_your_django_app>/media/;
+    }
+}
+```
+
+
 ## Цели проекта
 
 Код написан в учебных целях — это урок в курсе по Python и веб-разработке на сайте [Devman](https://dvmn.org). За основу был взят код проекта [FoodCart](https://github.com/Saibharath79/FoodCart).
