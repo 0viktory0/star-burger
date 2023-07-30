@@ -6,17 +6,19 @@ source venv/bin/activate
 
 git pull
 
-pip install -r requirements.txt
-npm ci --dev
-./node_modules/.bin/parcel build bundles-src/index.js --dist-dir bundles --public-url="./"
+echo "building frontend"
+sudo docker build -t star-burger_frontend -f dockerfiles/Dockerfile.frontend .
+sudo docker run --rm -v $(pwd)/bundles:/app/bundles star-burger_frontend
 
-python manage.py collectstatic --noinput
-python manage.py migrate --noinput
-systemctl reload django.service
-systemctl reload nginx.service
+echo "setting up backend"
+sudo docker-compose -f docker-compose.prod.yml up -d
+sudo docker exec -t django python manage.py migrate
+sudo docker cp django:/app/staticfiles .
 
-USERNAME=$(whoami)
-REVISION='1.0'
+echo "Clearing unused docker items"
+sudo docker system prune -f
+
+
 echo "environment:" "$ROLLBAR_ENVIRONMENT"
 ROLLBAR_ENVIRONMENT='production'
 
